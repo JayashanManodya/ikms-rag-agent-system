@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 from fastapi import FastAPI, File, HTTPException, Request, UploadFile, status
@@ -96,9 +97,14 @@ async def index_pdf(file: UploadFile = File(...)) -> dict:
             detail="Only PDF files are supported.",
         )
 
-    upload_dir = Path("data/uploads")
+    # Use /tmp for Vercel or other serverless environments
+    if os.environ.get("VERCEL"):
+        upload_dir = Path("/tmp") / "uploads"
+    else:
+        upload_dir = Path("data/uploads")
+        
     upload_dir.mkdir(parents=True, exist_ok=True)
-
+    
     file_path = upload_dir / file.filename
     contents = await file.read()
     file_path.write_bytes(contents)
