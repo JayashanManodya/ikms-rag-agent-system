@@ -3,6 +3,9 @@ from pathlib import Path
 from fastapi import FastAPI, File, HTTPException, Request, UploadFile, status
 from fastapi.responses import JSONResponse
 
+from .services.indexing_service import index_pdf_file
+
+
 app = FastAPI(
     title="Class 12 Multi-Agent RAG Demo",
     description=(
@@ -38,7 +41,7 @@ async def index_pdf(file: UploadFile = File(...)) -> dict:
     file_path.write_bytes(contents)
 
     # Index the saved PDF
-    # chunks_indexed = index_pdf_file(file_path)
+    chunks_indexed = index_pdf_file(file_path)
 
     return {
         "filename": file.filename,
