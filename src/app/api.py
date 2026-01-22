@@ -52,6 +52,7 @@ async def unhandled_exception_handler(
 
 
 @app.post("/qa", response_model=QAResponse, status_code=status.HTTP_200_OK)
+@app.post("/api/qa", response_model=QAResponse, status_code=status.HTTP_200_OK)
 async def qa_endpoint(payload: QuestionRequest) -> QAResponse:
     """Submit a question about the vector databases paper.
 
@@ -81,6 +82,7 @@ async def qa_endpoint(payload: QuestionRequest) -> QAResponse:
 
 
 @app.post("/index-pdf", status_code=status.HTTP_200_OK)
+@app.post("/api/index-pdf", status_code=status.HTTP_200_OK)
 async def index_pdf(file: UploadFile = File(...)) -> dict:
     """Upload a PDF and index it into the vector database.
 
