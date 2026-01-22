@@ -1,3 +1,4 @@
+import logging
 import os
 from pathlib import Path
 
@@ -20,6 +21,10 @@ app = FastAPI(
     version="0.1.0",
 )
 
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 # Enable CORS
 app.add_middleware(
     CORSMiddleware,
@@ -28,6 +33,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.get("/health")
+@app.get("/api/health")
+async def health_check():
+    """Simple health check endpoint."""
+    return {"status": "ok", "environment": "vercel" if os.environ.get("VERCEL") else "local"}
 
 
 @app.exception_handler(Exception)
@@ -99,6 +111,8 @@ async def index_pdf(file: UploadFile = File(...)) -> dict:
             detail="Only PDF files are supported.",
         )
 
+    logger.info(f"Received file upload: {file.filename}")
+    
     # Use /tmp for Vercel or other serverless environments
     if os.environ.get("VERCEL"):
         upload_dir = Path("/tmp") / "uploads"
@@ -108,11 +122,21 @@ async def index_pdf(file: UploadFile = File(...)) -> dict:
     upload_dir.mkdir(parents=True, exist_ok=True)
     
     file_path = upload_dir / file.filename
-    contents = await file.read()
-    file_path.write_bytes(contents)
+    try:
+        contents = await file.read()
+        file_path.write_bytes(contents)
+        logger.info(f"File saved to: {file_path}")
+    except Exception as e:
+        logger.error(f"Failed to save file: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to save file: {str(e)}")
 
     # Index the saved PDF
-    chunks_indexed = index_pdf_file(file_path)
+    try:
+        chunks_indexed = index_pdf_file(file_path)
+        logger.info(f"Successfully indexed {chunks_indexed} chunks")
+    except Exception as e:
+        logger.error(f"Indexing failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Indexing failed: {str(e)}")
 
     return {
         "filename": file.filename,

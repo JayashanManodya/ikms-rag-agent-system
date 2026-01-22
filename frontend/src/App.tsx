@@ -54,9 +54,10 @@ function App() {
         },
       });
       setUploadStatus({ type: 'success', message: `Successfully indexed ${response.data.chunks_indexed} chunks.` });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Upload failed:', error);
-      setUploadStatus({ type: 'error', message: 'Failed to upload and index PDF.' });
+      const errorMsg = error.response?.data?.detail || error.message || 'Failed to upload and index PDF.';
+      setUploadStatus({ type: 'error', message: errorMsg });
     } finally {
       setIsUploading(false);
     }
