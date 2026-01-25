@@ -88,7 +88,10 @@ function App() {
       <aside className="sidebar glass-panel">
         <div className="sidebar-header">
           <Bot size={28} className="icon-primary" />
-          <h2>RAG Agent</h2>
+          <div className="header-text">
+            <h2>RAG Agent</h2>
+            <span className="ai-badge">Built by AI</span>
+          </div>
         </div>
 
         <div className="upload-section">

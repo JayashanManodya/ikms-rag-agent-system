@@ -50,7 +50,8 @@ button:disabled {
   cursor: not-allowed;
 }
 
-input, textarea {
+input,
+textarea {
   background: var(--bg-card);
   border: 1px solid var(--border);
   color: var(--text-main);
@@ -60,7 +61,8 @@ input, textarea {
   transition: border-color 0.2s;
 }
 
-input:focus, textarea:focus {
+input:focus,
+textarea:focus {
   border-color: var(--primary);
 }
 
