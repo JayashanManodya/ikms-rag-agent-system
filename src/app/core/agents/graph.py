@@ -6,7 +6,7 @@ from typing import Any, Dict
 from langgraph.constants import END, START
 from langgraph.graph import StateGraph
 
-from .agents import retrieval_node, summarization_node, verification_node
+from .agents import retrieval_node, summarization_node, verification_node , planning_node
 from .state import QAState
 
 
@@ -69,6 +69,8 @@ def run_qa_flow(question: str) -> Dict[str, Any]:
         "context": None,
         "draft_answer": None,
         "answer": None,
+        "plan": None,
+        "sub_questions": None,
     }
 
     final_state = graph.invoke(initial_state)

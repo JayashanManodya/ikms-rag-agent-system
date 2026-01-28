@@ -14,6 +14,7 @@ from .prompts import (
     RETRIEVAL_SYSTEM_PROMPT,
     SUMMARIZATION_SYSTEM_PROMPT,
     VERIFICATION_SYSTEM_PROMPT,
+    PLANNING_AGENT_PROMPT,
 )
 from .state import QAState
 from .tools import retrieval_tool
@@ -53,7 +54,7 @@ verification_agent = create_agent(
     system_prompt=VERIFICATION_SYSTEM_PROMPT,
 )
 
-def planning_node(state):
+def planning_node(state: QAState) -> QAState:
     response = planning_agent.invoke(state["question"])
 
     return {

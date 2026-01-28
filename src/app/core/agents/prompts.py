@@ -3,7 +3,7 @@
 These system prompts define the behavior of the Retrieval, Summarization,
 and Verification agents used in the QA pipeline.
 """
-Planning Agent Prompt = """You are a Query Planning Agent.
+PLANNING_AGENT_PROMPT = """You are a Query Planning Agent.
 
 Given a user question:
 1. Identify if it contains multiple topics
