@@ -12,12 +12,12 @@ class Settings(BaseSettings):
     #OpenAI Configuration
     openai_api_key:str
     openai_model_name:str
-    openau_embedding_model_name:str
+    openai_embedding_model_name:str
 
     #Pinecone Configuration
     pinecone_api_key:str
     pinecone_index_name:str
-    pinecone_environment:str 
+    pinecone_environment: str = ""
 
     #Retrieval Configuration
     retrieval_k: int = 4

@@ -2,7 +2,7 @@
 
 from langchain_core.tools import tool
 
-from ..retrieval.vector_store import retrieve
+from ..retrieval.vector_state import retrieve
 from ..retrieval.serialization import serialize_chunks
 
 
