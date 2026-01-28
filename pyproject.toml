@@ -8,6 +8,7 @@ dependencies = [
     "fastapi>=0.128.0",
     "langchain>=1.2.6",
     "langchain-community>=0.3.0",
+    "langchain-google-genai>=4.2.0",
     "langchain-openai>=1.1.0",
     "langchain-pinecone>=0.2.13",
     "langchain-text-splitters>=1.0.0",
