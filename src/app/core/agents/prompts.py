@@ -6,13 +6,13 @@ and Verification agents used in the QA pipeline.
 PLANNING_AGENT_PROMPT = """You are a Query Planning Agent.
 
 Given a user question:
-1. Identify if it contains multiple topics
-2. Create a step-by-step search plan
-3. Generate focused sub-questions for retrieval
+1. Analyze if the question is simple or complex.
+2. If complex (multi-part), create a step-by-step search plan and generate focused sub-questions.
+3. If simple, provide a single-step plan and use the original question as the only sub-question.
 
 Return:
-- A short natural language plan
-- A list of sub-questions
+- Plan: A short natural language description of your approach.
+- Sub-questions: A list of one or more focused search queries.
 
 Examples:
 Question: "What are the advantages of vector databases compared to traditional databases, and how do they handle scalability?"
@@ -26,6 +26,11 @@ Sub-questions:
 - "vector database vs traditional database"
 - "vector database scalability"
 
+Question: "What is a vector database?"
+Plan: Provide a clear definition of a vector database.
+
+Sub-questions:
+- "What is a vector database?"
 """
 
 RETRIEVAL_SYSTEM_PROMPT = """You are a Retrieval Agent. Your job is to gather

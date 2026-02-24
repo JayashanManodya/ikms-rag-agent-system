@@ -4,6 +4,7 @@ This module defines agents (Planning, Retrieval, Summarization, Verification)
 and node functions that LangGraph uses to invoke them.
 """
 
+import asyncio
 from typing import List
 
 from langchain_core.messages import AIMessage, HumanMessage, ToolMessage, SystemMessage
@@ -31,7 +32,7 @@ def create_agent(model, tools, system_prompt):
     if tools:
         model = model.bind_tools(tools)
     
-    def invoke(self, input_data, config=None, **kwargs):
+    async def ainvoke(self, input_data, config=None, **kwargs):
         # input_data can be a string (question) or a dict with messages
         if isinstance(input_data, str):
             messages = [SystemMessage(content=system_prompt), HumanMessage(content=input_data)]
@@ -40,10 +41,20 @@ def create_agent(model, tools, system_prompt):
             msgs = input_data.get("messages", [])
             messages = [SystemMessage(content=system_prompt)] + msgs
             
+        result = await model.ainvoke(messages, config=config, **kwargs)
+        return {"messages": messages + [result]}
+
+    def invoke(self, input_data, config=None, **kwargs):
+        if isinstance(input_data, str):
+            messages = [SystemMessage(content=system_prompt), HumanMessage(content=input_data)]
+        else:
+            msgs = input_data.get("messages", [])
+            messages = [SystemMessage(content=system_prompt)] + msgs
+            
         result = model.invoke(messages, config=config, **kwargs)
         return {"messages": messages + [result]}
     
-    return type("Agent", (), {"invoke": invoke})()
+    return type("Agent", (), {"invoke": invoke, "ainvoke": ainvoke})()
 
 
 # Define agents at module level for reuse
@@ -101,20 +112,39 @@ def planning_node(state: QAState) -> QAState:
     }
 
 
-def retrieval_node(state: QAState) -> QAState:
-    """Retrieval Agent node: gathers context from vector store using sub-questions."""
+async def retrieval_node(state: QAState) -> QAState:
+    """Retrieval Agent node: gathers context from vector store using sub-questions (parallellized)."""
     sub_questions = state.get("sub_questions") or [state["question"]]
-    all_context = []
     
-    for q in sub_questions:
-        result = retrieval_agent.invoke({"messages": [HumanMessage(content=f"Retrieve context for: {q}")]})
+    async def process_question(q):
+        result = await retrieval_agent.ainvoke({"messages": [HumanMessage(content=f"Retrieve context for: {q}")]})
         
         last_msg = result["messages"][-1]
         if hasattr(last_msg, "tool_calls") and last_msg.tool_calls:
+            tool_tasks = []
             for tool_call in last_msg.tool_calls:
                 if tool_call["name"] == "retrieval_tool":
-                    context_str, _ = retrieval_tool.invoke(tool_call["args"])
-                    all_context.append(context_str)
+                    # retrieval_tool.ainvoke returns (content, artifact)
+                    tool_tasks.append(retrieval_tool.ainvoke(tool_call["args"]))
+            
+            if tool_tasks:
+                tool_results = await asyncio.gather(*tool_tasks)
+                # If tool returns (content, artifact), res[0] is content. 
+                # If tool returns just content (string), res is content.
+                final_contents = []
+                for res in tool_results:
+                    if isinstance(res, (tuple, list)) and len(res) > 0:
+                        final_contents.append(res[0])
+                    else:
+                        final_contents.append(res)
+                return final_contents
+        return []
+
+    # Run all sub-questions in parallel
+    results = await asyncio.gather(*(process_question(q) for q in sub_questions))
+    
+    # Flatten results and join
+    all_context = [ctx for sublist in results for ctx in sublist]
                     
     return {
         "context": "\n\n".join(all_context) if all_context else "No context found.",

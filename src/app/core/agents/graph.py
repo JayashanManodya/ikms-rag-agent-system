@@ -45,7 +45,7 @@ def get_qa_graph() -> Any:
     return create_qa_graph()
 
 
-def run_qa_flow(question: str) -> Dict[str, Any]:
+async def run_qa_flow(question: str) -> Dict[str, Any]:
     """Run the complete multi-agent QA flow for a question.
 
     This is the main entry point for the QA system. It:
@@ -73,6 +73,6 @@ def run_qa_flow(question: str) -> Dict[str, Any]:
         "sub_questions": None,
     }
 
-    final_state = graph.invoke(initial_state)
+    final_state = await graph.ainvoke(initial_state)
 
     return final_state
