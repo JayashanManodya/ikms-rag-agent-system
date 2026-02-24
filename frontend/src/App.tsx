@@ -9,8 +9,7 @@ interface Message {
   content: string;
 }
 
-const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-const API_BASE_URL = import.meta.env.VITE_API_URL || (isLocal ? 'https://ikms-rag-agent-system-odpz.vercel.app' : '/api');
+const API_BASE_URL = "https://ikms-rag-agent-system-odpz.vercel.app"
 
 function App() {
   const [messages, setMessages] = useState<Message[]>([]);
