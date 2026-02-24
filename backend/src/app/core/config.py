@@ -4,7 +4,13 @@ This module uses Pydantic Settings to load and validate environment variables
 for OpenAI models, Pinecone settings, and other system parameters.
 """
 
+import os
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+# On Vercel (and other serverless platforms), there is no .env file —
+# environment variables are injected directly by the platform.
+# Passing env_file=None tells pydantic-settings to skip file lookup entirely.
+_ENV_FILE = ".env" if os.path.exists(".env") else None
 
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
@@ -23,9 +29,8 @@ class Settings(BaseSettings):
     retrieval_k: int = 4
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=_ENV_FILE,
         env_file_encoding="utf-8",
-        env_file_required=False,  # Don't crash if .env is absent (e.g. on Vercel)
         case_sensitive=False,
         extra="ignore",
     )

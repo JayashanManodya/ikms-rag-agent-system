@@ -1,5 +1,7 @@
 """FastAPI entry point for the IKMS RAG system."""
 
+import traceback as _traceback
+
 from fastapi import FastAPI, HTTPException, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from .models import QuestionRequest, QAResponse
@@ -43,7 +45,7 @@ async def index_pdf_endpoint(file: UploadFile = File(...)):
             "chunks": num_chunks
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=_traceback.format_exc())
 
 @app.get("/health")
 async def health_check():
