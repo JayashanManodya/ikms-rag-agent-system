@@ -25,7 +25,8 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
-        case_sensitive=False,   
+        env_file_required=False,  # Don't crash if .env is absent (e.g. on Vercel)
+        case_sensitive=False,
         extra="ignore",
     )
 
