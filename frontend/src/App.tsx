@@ -9,7 +9,7 @@ interface Message {
   content: string;
 }
 
-const API_BASE_URL = "https://ikms-rag-agent-system-odpz.vercel.app"
+const API_BASE_URL = "https://ikms-rag-agent-system-production.up.railway.app"
 
 function App() {
   const [messages, setMessages] = useState<Message[]>([]);
