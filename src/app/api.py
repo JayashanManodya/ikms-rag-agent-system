@@ -62,7 +62,7 @@ async def index_pdf_endpoint(file: UploadFile = File(...)):
         if file_path.exists():
             file_path.unlink()
 
-@app.get("/health")
-async def health_check():
-    """Health check endpoint."""
-    return {"status": "ok"}
+# @app.get("/health")
+# async def health_check():
+#     """Health check endpoint."""
+#     return {"status": "ok"}
