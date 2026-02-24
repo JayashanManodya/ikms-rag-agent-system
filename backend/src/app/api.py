@@ -14,7 +14,7 @@ app = FastAPI(title="IKMS RAG Agent System")
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Your frontend URL
+    allow_origins=["*"],  # Your frontend URL
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -62,7 +62,7 @@ async def index_pdf_endpoint(file: UploadFile = File(...)):
         if file_path.exists():
             file_path.unlink()
 
-# @app.get("/health")
-# async def health_check():
-#     """Health check endpoint."""
-#     return {"status": "ok"}
+@app.get("/health")
+async def health_check():
+    """Health check endpoint."""
+    return {"status": "ok"}
