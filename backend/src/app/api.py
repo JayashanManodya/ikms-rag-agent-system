@@ -51,3 +51,17 @@ async def index_pdf_endpoint(file: UploadFile = File(...)):
 async def health_check():
     """Health check endpoint."""
     return {"status": "ok"}
+
+
+@app.get("/")
+async def root():
+    """Root endpoint for basic API info."""
+    return {
+        "name": "IKMS RAG Agent System",
+        "version": "1.0.0",
+        "endpoints": {
+            "qa": "POST /qa",
+            "index_pdf": "POST /index-pdf",
+            "health": "GET /health",
+        },
+    }
