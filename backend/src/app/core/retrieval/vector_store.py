@@ -1,5 +1,6 @@
 """Vector store wrapper for Pinecone integration with LangChain."""
 
+import io
 from pathlib import Path
 from functools import lru_cache
 from typing import List
@@ -10,6 +11,7 @@ from langchain_pinecone import PineconeVectorStore
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+import pypdf
 
 
 from ..config import get_settings
@@ -70,16 +72,41 @@ def retrieve(query: str, k: int | None = None) -> List[Document]:
 
 
 def index_documents(file_path: Path) -> int:
-    """Index a list of Document objects into the Pinecone vector store.
+    """Index a PDF file from disk into the Pinecone vector store.
 
     Args:
-        docs: Documents to embed and upsert into the vector index.
+        file_path: Path to the PDF file on disk.
 
     Returns:
-        The number of documents indexed.
+        The number of chunks indexed.
     """
     loader = PyPDFLoader(str(file_path), mode="single")
     docs = loader.load()
+
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
+    texts = text_splitter.split_documents(docs)
+
+    vector_store = _get_vector_store()
+    vector_store.add_documents(texts)
+    return len(texts)
+
+
+def index_documents_from_bytes(file_bytes: bytes, filename: str = "upload.pdf") -> int:
+    """Index a PDF from in-memory bytes (no disk I/O — safe for Vercel serverless).
+
+    Args:
+        file_bytes: Raw PDF file content as bytes.
+        filename: Original filename used for metadata only.
+
+    Returns:
+        The number of chunks indexed.
+    """
+    reader = pypdf.PdfReader(io.BytesIO(file_bytes))
+    full_text = "\n".join(
+        page.extract_text() or "" for page in reader.pages
+    )
+
+    docs = [Document(page_content=full_text, metadata={"source": filename})]
 
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
     texts = text_splitter.split_documents(docs)
