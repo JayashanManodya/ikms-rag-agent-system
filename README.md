@@ -4,7 +4,7 @@
 
 ---
 
-Demo(Try it) - https://ikms-rag-agent-system.vercel.ap
+Demo(Try it) - https://ikms-rag-agent-system.vercel.app
 
 ## Table of Contents
 
