@@ -595,4 +595,4 @@ This project is part of the **IKMS (Intelligent Knowledge Management System)** a
 
 ---
 
-*Built with ❤️ using FastAPI, LangGraph, Pinecone, and OpenAI.*
+*Built with using FastAPI, LangGraph, Pinecone, and OpenAI.*
