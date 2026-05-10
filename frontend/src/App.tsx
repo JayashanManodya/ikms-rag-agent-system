@@ -9,7 +9,13 @@ interface Message {
   content: string;
 }
 
-const API_BASE_URL = "https://ikms-rag-agent-system-production.up.railway.app"
+const rawApiUrl = import.meta.env.VITE_API_URL;
+if (!rawApiUrl) {
+  throw new Error(
+    'VITE_API_URL is not set. Add it to frontend/.env.local or your host (e.g. Vercel) environment variables.'
+  );
+}
+const API_BASE_URL = rawApiUrl.replace(/\/$/, '');
 
 function App() {
   const [messages, setMessages] = useState<Message[]>([]);
