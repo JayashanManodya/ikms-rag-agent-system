@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Upload, Send, FileText, Loader2, Bot, User, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Upload, Send, FileText, Loader2, Bot, User, CheckCircle2, AlertCircle, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import './App.css';
@@ -16,6 +16,11 @@ if (!rawApiUrl) {
   );
 }
 const API_BASE_URL = rawApiUrl.replace(/\/$/, '');
+
+/** Yellow sidebar note: free-tier testing, larger PDFs. */
+const DEMO_FREE_HOST_TITLE = 'Running on free hosting (testing)';
+const DEMO_FREE_HOST_BODY =
+  'This demo uses free servers, so they may sleep when nobody’s using the app. Larger PDFs also need more time to upload and process. Delays are expected not a bug. Thanks for sticking with us while things spin up.';
 
 function App() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -58,7 +63,14 @@ function App() {
           'Content-Type': 'multipart/form-data',
         },
       });
-      setUploadStatus({ type: 'success', message: `Successfully indexed ${response.data.chunks_indexed} chunks.` });
+      const n = response.data.chunks ?? response.data.chunks_indexed;
+      setUploadStatus({
+        type: 'success',
+        message:
+          typeof n === 'number'
+            ? `Successfully indexed ${n} chunk${n === 1 ? '' : 's'}.`
+            : (response.data.message as string) || 'Successfully indexed your PDF.',
+      });
     } catch (error: any) {
       console.error('Upload failed:', error);
       const errorMsg = error.response?.data?.detail || error.message || 'Failed to upload and index PDF.';
@@ -114,7 +126,7 @@ function App() {
             disabled={isUploading}
           >
             {isUploading ? <Loader2 className="animate-spin" /> : <Upload size={18} />}
-            {isUploading ? 'Indexing...' : 'Upload PDF'}
+            {isUploading ? 'Processing on server…' : 'Upload PDF'}
           </button>
 
           {fileName && (
@@ -127,13 +139,25 @@ function App() {
           <AnimatePresence>
             {uploadStatus && (
               <motion.div
+                key="upload-status-block"
+                className="upload-status-stack"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
-                className={`status-msg ${uploadStatus.type}`}
               >
-                {uploadStatus.type === 'success' ? <CheckCircle2 size={14} /> : <AlertCircle size={14} />}
-                <span>{uploadStatus.message}</span>
+                <div className={`status-msg ${uploadStatus.type}`}>
+                  {uploadStatus.type === 'success' ? <CheckCircle2 size={14} /> : <AlertCircle size={14} />}
+                  <span>{uploadStatus.message}</span>
+                </div>
+                {uploadStatus.type === 'success' && (
+                  <div className="demo-notice" role="note">
+                    <AlertTriangle size={18} className="demo-notice-icon" aria-hidden />
+                    <div className="demo-notice-copy">
+                      <strong className="demo-notice-title">{DEMO_FREE_HOST_TITLE}</strong>
+                      <span>{DEMO_FREE_HOST_BODY}</span>
+                    </div>
+                  </div>
+                )}
               </motion.div>
             )}
           </AnimatePresence>
