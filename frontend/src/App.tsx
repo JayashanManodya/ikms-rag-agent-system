@@ -18,9 +18,9 @@ if (!rawApiUrl) {
 const API_BASE_URL = rawApiUrl.replace(/\/$/, '');
 
 /** Yellow sidebar note: free-tier testing, larger PDFs. */
-const DEMO_FREE_HOST_TITLE = 'Running on free hosting (testing)';
+const DEMO_FREE_HOST_TITLE = 'Demo notice — free online hosting';
 const DEMO_FREE_HOST_BODY =
-  'This demo uses free servers, so they may sleep when nobody’s using the app. Larger PDFs also need more time to upload and process. Delays are expected—not a bug. Thanks for sticking with us while things spin up.';
+  'This app runs on free cloud hosting, so it may pause when idle. The first request after a break can take a minute, and larger PDFs take longer to read. Please wait—that’s normal.';
 
 function FreeHostingNotice({ role = 'status' }: { role?: 'status' | 'note' }) {
   return (
@@ -58,7 +58,7 @@ function App() {
     if (!file) return;
 
     if (file.type !== 'application/pdf') {
-      setUploadStatus({ type: 'error', message: 'Only PDF files are supported.' });
+      setUploadStatus({ type: 'error', message: 'Please choose a PDF file (.pdf).' });
       return;
     }
 
@@ -80,12 +80,12 @@ function App() {
         type: 'success',
         message:
           typeof n === 'number'
-            ? `Successfully indexed ${n} chunk${n === 1 ? '' : 's'}.`
-            : (response.data.message as string) || 'Successfully indexed your PDF.',
+            ? `All set! Your PDF is ready—we’ve read ${n} section${n === 1 ? '' : 's'} from it. Ask a question on the right.`
+            : (response.data.message as string) || 'Your PDF is ready. You can ask questions about it now.',
       });
     } catch (error: any) {
       console.error('Upload failed:', error);
-      const errorMsg = error.response?.data?.detail || error.message || 'Failed to upload and index PDF.';
+      const errorMsg = error.response?.data?.detail || error.message || 'We couldn’t finish reading your PDF. Check your connection and try again.';
       setUploadStatus({ type: 'error', message: errorMsg });
     } finally {
       setIsUploading(false);
@@ -105,24 +105,25 @@ function App() {
       setMessages(prev => [...prev, { role: 'assistant', content: response.data.answer }]);
     } catch (error) {
       console.error('QA request failed:', error);
-      setMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, I encountered an error while processing your request.' }]);
+      setMessages(prev => [...prev, { role: 'assistant', content: 'Something went wrong answering that—please try again in a moment.' }]);
     } finally {
       setIsAnswering(false);
     }
   };
 
   return (
-    <div className="app-container">
+    <div className="app-shell">
+      <div className="app-container">
       {/* Sidebar / Upload Panel */}
       <aside className="sidebar glass-panel">
         <div className="sidebar-header">
           <Bot size={28} className="icon-primary" />
-          <h2>RAG Agent</h2>
+          <h2>Ask your PDF</h2>
         </div>
 
         <div className="upload-section">
-          <h3>Document</h3>
-          <p className="text-muted">Upload a PDF to start asking questions.</p>
+          <h3>Your document</h3>
+          <p className="text-muted">Upload a PDF, then chat with an assistant that answers using only what’s in your file.</p>
 
           <input
             type="file"
@@ -138,7 +139,7 @@ function App() {
             disabled={isUploading}
           >
             {isUploading ? <Loader2 className="animate-spin" /> : <Upload size={18} />}
-            {isUploading ? 'Processing on server…' : 'Upload PDF'}
+            {isUploading ? 'Reading your file…' : 'Upload your PDF'}
           </button>
 
           <AnimatePresence>
@@ -186,7 +187,7 @@ function App() {
         <header className="chat-header glass-panel">
           <div className="status-indicator">
             <div className="pulse-dot"></div>
-            <span>System Active</span>
+            <span>Ready to help</span>
           </div>
         </header>
 
@@ -194,8 +195,8 @@ function App() {
           {messages.length === 0 ? (
             <div className="welcome-screen">
               <Bot size={48} className="welcome-icon" />
-              <h1>Ask anything about your PDF</h1>
-              <p>Upload a document and I'll help you extract insights from it.</p>
+              <h1>Chat with your document</h1>
+              <p>First upload a PDF on the left. Then ask plain-language questions. we answer using the text in your file, not random web results.</p>
             </div>
           ) : (
             messages.map((msg, idx) => (
@@ -230,7 +231,7 @@ function App() {
         <footer className="input-panel glass-panel">
           <div className="input-wrapper">
             <textarea
-              placeholder="Ask a question..."
+              placeholder="Type your question about the PDF…"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => {
@@ -251,6 +252,28 @@ function App() {
           </div>
         </footer>
       </main>
+      </div>
+
+      <footer className="site-footer">
+        <div className="site-footer-inner">
+          <p className="site-footer-copy">
+            Built by{' '}
+            <a
+              className="site-footer-link"
+              href="https://www.jayashan.online/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Jayashan Manodya
+            </a>
+            <span className="site-footer-sep" aria-hidden>
+              {' '}
+              ·{' '}
+            </span>
+            © {new Date().getFullYear()}. All rights reserved.
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }
