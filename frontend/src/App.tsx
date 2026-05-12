@@ -18,9 +18,9 @@ if (!rawApiUrl) {
 const API_BASE_URL = rawApiUrl.replace(/\/$/, '');
 
 /** Yellow sidebar note: free-tier testing, larger PDFs. */
-const DEMO_FREE_HOST_TITLE = 'Demo notice — free online hosting';
+const DEMO_FREE_HOST_TITLE = 'Running on free hosting (testing)';
 const DEMO_FREE_HOST_BODY =
-  'This app runs on free cloud hosting, so it may pause when idle. The first request after a break can take a minute, and larger PDFs take longer to read. Please wait—that’s normal.';
+  'This demo uses free servers, so they may sleep when nobody’s using the app. Larger PDFs also need more time to upload and process. Delays are expected—not a bug. Thanks for sticking with us while things spin up.';
 
 function FreeHostingNotice({ role = 'status' }: { role?: 'status' | 'note' }) {
   return (
