@@ -20,7 +20,19 @@ const API_BASE_URL = rawApiUrl.replace(/\/$/, '');
 /** Yellow sidebar note: free-tier testing, larger PDFs. */
 const DEMO_FREE_HOST_TITLE = 'Running on free hosting (testing)';
 const DEMO_FREE_HOST_BODY =
-  'This demo uses free servers, so they may sleep when nobody’s using the app. Larger PDFs also need more time to upload and process. Delays are expected not a bug. Thanks for sticking with us while things spin up.';
+  'This demo uses free servers, so they may sleep when nobody’s using the app. Larger PDFs also need more time to upload and process. Delays are expected—not a bug. Thanks for sticking with us while things spin up.';
+
+function FreeHostingNotice({ role = 'status' }: { role?: 'status' | 'note' }) {
+  return (
+    <div className="demo-notice" role={role}>
+      <AlertTriangle size={18} className="demo-notice-icon" aria-hidden />
+      <div className="demo-notice-copy">
+        <strong className="demo-notice-title">{DEMO_FREE_HOST_TITLE}</strong>
+        <span>{DEMO_FREE_HOST_BODY}</span>
+      </div>
+    </div>
+  );
+}
 
 function App() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -129,6 +141,19 @@ function App() {
             {isUploading ? 'Processing on server…' : 'Upload PDF'}
           </button>
 
+          <AnimatePresence>
+            {isUploading && (
+              <motion.div
+                key="upload-free-hosting-hint"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+              >
+                <FreeHostingNotice role="status" />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           {fileName && (
             <div className="file-info">
               <FileText size={16} />
@@ -149,15 +174,7 @@ function App() {
                   {uploadStatus.type === 'success' ? <CheckCircle2 size={14} /> : <AlertCircle size={14} />}
                   <span>{uploadStatus.message}</span>
                 </div>
-                {uploadStatus.type === 'success' && (
-                  <div className="demo-notice" role="note">
-                    <AlertTriangle size={18} className="demo-notice-icon" aria-hidden />
-                    <div className="demo-notice-copy">
-                      <strong className="demo-notice-title">{DEMO_FREE_HOST_TITLE}</strong>
-                      <span>{DEMO_FREE_HOST_BODY}</span>
-                    </div>
-                  </div>
-                )}
+                {uploadStatus.type === 'success' && <FreeHostingNotice role="note" />}
               </motion.div>
             )}
           </AnimatePresence>
