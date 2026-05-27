@@ -20,7 +20,7 @@ const API_BASE_URL = rawApiUrl.replace(/\/$/, '');
 /** Yellow sidebar note: free-tier testing, larger PDFs. */
 const DEMO_FREE_HOST_TITLE = 'Running on free hosting (testing)';
 const DEMO_FREE_HOST_BODY =
-  'This demo uses free servers, so they may sleep when nobody’s using the app. Larger PDFs also need more time to upload and process. Delays are expected—not a bug. Thanks for sticking with us while things spin up.';
+  'This demo uses free servers, so they may sleep when nobody’s using the app. Larger PDFs also need more time to upload and process. Delays are expected - not a bug. Thanks for sticking with us while things spin up.';
 
 function FreeHostingNotice({ role = 'status' }: { role?: 'status' | 'note' }) {
   return (
@@ -80,7 +80,7 @@ function App() {
         type: 'success',
         message:
           typeof n === 'number'
-            ? `All set! Your PDF is ready—we’ve read ${n} section${n === 1 ? '' : 's'} from it. Ask a question on the right.`
+            ? `All set! Your PDF is ready. we’ve read ${n} section${n === 1 ? '' : 's'} from it. Ask a question on the right.`
             : (response.data.message as string) || 'Your PDF is ready. You can ask questions about it now.',
       });
     } catch (error: any) {
